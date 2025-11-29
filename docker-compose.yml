@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  kara-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    container_name: kara-server
+    ports:
+      - "65432:65432"
+    networks:
+      - kara-network
+    restart: unless-stopped
+    environment:
+      - KARA_HOST=0.0.0.0
+      - KARA_PORT=65432
+
+  kara-client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: kara-client
+    depends_on:
+      - kara-server
+    networks:
+      - kara-network
+    stdin_open: true
+    tty: true
+    environment:
+      - KARA_HOST=kara-server
+      - KARA_PORT=65432
+
+networks:
+  kara-network:
+    driver: bridge
+
